@@ -333,9 +333,6 @@ class WorkflowEngineDetectorSerializer(Serializer):
         for detector in detectors.values():
             result[detector]["alert_rule_id"] = alert_rule_ids_by_detector_id.get(detector.id)
 
-        # Note: originalAlertRuleId comes from AlertRuleActivity snapshots, which were not
-        # migrated to the workflow engine. This field will always be None for detectors.
-
         if "latestIncident" in self.expand:
             # to get the actions for a detector, we need to go from detector -> workflow -> action filters for that workflow -> actions
             detector_workflow_values = DetectorWorkflow.objects.filter(
