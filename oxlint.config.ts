@@ -1,8 +1,13 @@
 import {defineConfig} from 'oxlint';
 
 export const incubator = defineConfig({
-  rules: {},
-  overrides: [],
+  rules: {'@sentry/scraps/prefer-primitives': 'error'},
+  overrides: [
+    {
+      files: ['static/app/components/core/**'],
+      rules: {'@sentry/scraps/prefer-primitives': 'off'},
+    },
+  ],
 });
 
 const IS_PRECOMMIT =
