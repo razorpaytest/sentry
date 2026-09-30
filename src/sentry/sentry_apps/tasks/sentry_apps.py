@@ -45,6 +45,7 @@ from sentry.models.group import Group
 from sentry.models.organization import Organization
 from sentry.models.organizationmapping import OrganizationMapping
 from sentry.models.project import Project
+from sentry.notifications.types import RuleFuture
 from sentry.notifications.utils.rules import get_rule_or_workflow_id
 from sentry.sentry_apps.api.serializers.app_platform_event import AppPlatformEvent
 from sentry.sentry_apps.event_types import SentryAppEventType
@@ -80,7 +81,6 @@ from sentry.silo.base import SiloMode
 from sentry.tasks.base import instrumented_task
 from sentry.taskworker.namespaces import sentryapp_control_tasks, sentryapp_tasks
 from sentry.taskworker.timeout import InnerTimeoutError
-from sentry.types.rules import RuleFuture
 from sentry.users.services.user.model import RpcUser
 from sentry.users.services.user.service import user_service
 from sentry.utils import json, metrics
@@ -808,18 +808,18 @@ def notify_sentry_app(event: GroupEvent, futures: Sequence[RuleFuture]) -> None:
 
         # If the future comes from a rule with a UI component form in the schema, append the issue alert payload
         # TODO(ecosystem): We need to change this payload format after alerts create issues
-        id = f.rule.id
+        rule_or_workflow_id: int | str = f.rule.id
 
         # if we are using the new workflow engine, we need to use the legacy rule id
         # Ignore test notifications
-        if int(id) != -1:
-            _, id = get_rule_or_workflow_id(f.rule)
+        if int(rule_or_workflow_id) != -1:
+            _, rule_or_workflow_id = get_rule_or_workflow_id(f.rule)
 
         settings = f.kwargs.get("schema_defined_settings")
         if settings:
             extra_kwargs["additional_payload_key"] = "issue_alert"
             extra_kwargs["additional_payload"] = {
-                "id": int(id),
+                "id": int(rule_or_workflow_id),
                 "title": f.rule.label,
                 "sentry_app_id": f.kwargs["sentry_app"].id,
                 "settings": settings,

@@ -40,7 +40,7 @@ from sentry.monitors.grouptype import MonitorIncidentType
 from sentry.notifications.models.notificationsettingoption import NotificationSettingOption
 from sentry.notifications.models.notificationsettingprovider import NotificationSettingProvider
 from sentry.notifications.notifications.rules import AlertRuleNotification
-from sentry.notifications.types import ActionTargetType, FallthroughChoiceType
+from sentry.notifications.types import ActionTargetType, FallthroughChoiceType, RuleFuture
 from sentry.notifications.utils.digest import get_digest_subject
 from sentry.plugins.base import Notification
 from sentry.replays.testutils import mock_replay
@@ -56,7 +56,6 @@ from sentry.testutils.skips import requires_snuba
 from sentry.types.activity import ActivityType
 from sentry.types.actor import Actor
 from sentry.types.group import GroupSubStatus
-from sentry.types.rules import RuleFuture
 from sentry.users.models.user_option import UserOption
 from sentry.users.models.useremail import UserEmail
 from sentry.utils.email import MessageBuilder, get_email_addresses

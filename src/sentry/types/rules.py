@@ -1,7 +1,4 @@
-from collections import namedtuple
 from dataclasses import dataclass
-
-RuleFuture = namedtuple("RuleFuture", ["rule", "kwargs"])
 
 
 @dataclass

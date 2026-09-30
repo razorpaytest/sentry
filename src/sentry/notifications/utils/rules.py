@@ -3,11 +3,20 @@ from dataclasses import dataclass
 from typing import Literal
 
 from sentry.models.rule import Rule
+from sentry.notifications.types import NotificationRule
 
 RuleIdType = Literal["workflow_id", "legacy_rule_id"]
 
 
-def get_key_from_rule_data(rule: Rule, key: str) -> str:
+def get_legacy_rule_id(rule: Rule | NotificationRule) -> int | None:
+    if isinstance(rule, Rule):
+        return rule.id
+
+    value = rule.data.get("actions", [{}])[0].get("legacy_rule_id")
+    return int(value) if value is not None else None
+
+
+def get_key_from_rule_data(rule: Rule | NotificationRule, key: str) -> str:
     value = rule.data.get("actions", [{}])[0].get(key)
     assert value is not None
     return value
@@ -15,11 +24,11 @@ def get_key_from_rule_data(rule: Rule, key: str) -> str:
 
 @dataclass
 class RulesAndWorkflows:
-    rules: list[Rule]
-    workflow_rules: list[Rule]  # workflows as fake Rules
+    rules: list[NotificationRule]
+    workflow_rules: list[NotificationRule]
 
 
-def split_rules_by_rule_workflow_id(rules: Sequence[Rule]) -> RulesAndWorkflows:
+def split_rules_by_rule_workflow_id(rules: Sequence[NotificationRule]) -> RulesAndWorkflows:
     parsed_rules = []
     workflow_rules = []
     for rule in rules:
@@ -32,7 +41,7 @@ def split_rules_by_rule_workflow_id(rules: Sequence[Rule]) -> RulesAndWorkflows:
     return RulesAndWorkflows(rules=parsed_rules, workflow_rules=workflow_rules)
 
 
-def get_rule_or_workflow_id(rule: Rule) -> tuple[RuleIdType, str]:
+def get_rule_or_workflow_id(rule: Rule | NotificationRule) -> tuple[RuleIdType, str]:
     try:
         return ("legacy_rule_id", get_key_from_rule_data(rule, "legacy_rule_id"))
     except AssertionError:

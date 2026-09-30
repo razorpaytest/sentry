@@ -23,8 +23,8 @@ from sentry.integrations.services.integration.service import integration_service
 from sentry.models.activity import Activity
 from sentry.models.organization import Organization
 from sentry.models.project import Project
-from sentry.models.rule import Rule, RuleSource
-from sentry.notifications.types import TEST_NOTIFICATION_ID
+from sentry.models.rule import Rule
+from sentry.notifications.types import TEST_NOTIFICATION_ID, NotificationRule, RuleFuture
 from sentry.notifications.utils.issue_notification_context import IssueNotificationContext
 from sentry.rules.processing.processor import activate_downstream_actions
 from sentry.services.eventstore.models import GroupEvent
@@ -34,7 +34,6 @@ from sentry.shared_integrations.exceptions import (
     IntegrationFormError,
 )
 from sentry.types.activity import ActivityType
-from sentry.types.rules import RuleFuture
 from sentry.workflow_engine.models import Action, AlertRuleWorkflow, Detector, Workflow
 from sentry.workflow_engine.types import (
     ActionInvocation,
@@ -207,7 +206,7 @@ class BaseIssueAlertHandler(ABC):
         detector: Detector,
         event_data: WorkflowEventData,
         workflow_id: WorkflowId | None,
-    ) -> Rule:
+    ) -> NotificationRule:
         """
         Creates a Rule instance from the Action model.
         :param action: Action
@@ -275,14 +274,12 @@ class BaseIssueAlertHandler(ABC):
             # mail action needs to have skipDigests set to True
             data["actions"][0]["skipDigests"] = True
 
-        rule = Rule(
+        rule = NotificationRule(
             id=action.id,
             project=detector.linked_project,
             environment_id=environment_id,
             label=label,
             data=dict(data),
-            status=ObjectStatus.ACTIVE,
-            source=RuleSource.ISSUE,
         )
 
         return rule
@@ -290,7 +287,7 @@ class BaseIssueAlertHandler(ABC):
     @staticmethod
     def get_rule_futures(
         event_data: WorkflowEventData,
-        rule: Rule,
+        rule: NotificationRule,
         notification_uuid: str,
     ) -> Collection[tuple[Callable[[GroupEvent, Sequence[RuleFuture]], None], list[RuleFuture]]]:
         """

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable, Sequence
+from typing import Any
 
 from rest_framework.response import Response
 
@@ -20,6 +21,7 @@ from sentry.issues.action_log.publish import publish_action_from_context
 from sentry.issues.action_log.types import CreateExternalIssueAction
 from sentry.models.activity import Activity
 from sentry.models.grouplink import GroupLink
+from sentry.notifications.types import RuleFuture
 from sentry.notifications.utils.links import create_link_to_workflow
 from sentry.services.eventstore.models import GroupEvent
 from sentry.shared_integrations.exceptions import (
@@ -31,7 +33,6 @@ from sentry.shared_integrations.exceptions import (
 )
 from sentry.silo.base import cell_silo_function
 from sentry.types.activity import ActivityType
-from sentry.types.rules import RuleFuture
 
 logger = logging.getLogger("sentry.rules")
 
@@ -137,16 +138,15 @@ def create_issue(event: GroupEvent, futures: Sequence[RuleFuture]) -> None:
     organization = event.group.project.organization
 
     for future in futures:
-        rule_id = future.rule.id
-        data = future.kwargs.get("data")
+        action_id = future.rule.id
+        data: dict[str, Any] = future.kwargs["data"]
         provider = future.kwargs.get("provider")
         integration_id = future.kwargs.get("integration_id")
-        generate_footer = future.kwargs.get("generate_footer")
+        generate_footer: Callable[[str], str] = future.kwargs["generate_footer"]
 
         # If we invoked this handler from the notification action, we need to replace the rule_id with the legacy_rule_id, so we link notifications correctly
         # In the Notification Action, we store the rule_id in the action_id field
-        action_id = rule_id
-        rule_id = data.get("legacy_rule_id")
+        legacy_rule_id = data.get("legacy_rule_id")
 
         integration = integration_service.get_integration(
             integration_id=integration_id,
@@ -171,7 +171,10 @@ def create_issue(event: GroupEvent, futures: Sequence[RuleFuture]) -> None:
                 event, workflow_id, installation, generate_footer
             )
         else:
-            data["description"] = build_description(event, rule_id, installation, generate_footer)
+            assert isinstance(legacy_rule_id, int)
+            data["description"] = build_description(
+                event, legacy_rule_id, installation, generate_footer
+            )
 
         if data.get("dynamic_form_fields"):
             del data["dynamic_form_fields"]
@@ -181,7 +184,7 @@ def create_issue(event: GroupEvent, futures: Sequence[RuleFuture]) -> None:
                 "%s.rule_trigger.link_already_exists",
                 provider,
                 extra={
-                    "rule_id": rule_id,
+                    "rule_id": legacy_rule_id,
                     "project_id": event.group.project.id,
                     "group_id": event.group.id,
                 },
@@ -194,7 +197,7 @@ def create_issue(event: GroupEvent, futures: Sequence[RuleFuture]) -> None:
         ).capture() as lifecycle:
             lifecycle.add_extra("provider", provider)
             lifecycle.add_extra("integration_id", integration.id)
-            lifecycle.add_extra("rule_id", rule_id)
+            lifecycle.add_extra("rule_id", legacy_rule_id)
 
             if action_id:
                 lifecycle.add_extra("action_id", action_id)

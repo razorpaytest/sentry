@@ -658,7 +658,7 @@ class MsTeamsWebhookEndpoint(Endpoint):
             issue_change_response = self._issue_state_change(group, identity, data["value"])
 
             # get the rules from the payload
-            rules = tuple(Rule.objects.filter(id__in=payload["rules"]))
+            rules = tuple(Rule.objects.filter(id__in=payload["rules"], project_id=group.project_id))
 
             # pull the event based off our payload
             event = None
