@@ -40,7 +40,12 @@ from sentry.monitors.grouptype import MonitorIncidentType
 from sentry.notifications.models.notificationsettingoption import NotificationSettingOption
 from sentry.notifications.models.notificationsettingprovider import NotificationSettingProvider
 from sentry.notifications.notifications.rules import AlertRuleNotification
-from sentry.notifications.types import ActionTargetType, FallthroughChoiceType, RuleFuture
+from sentry.notifications.types import (
+    ActionTargetType,
+    FallthroughChoiceType,
+    NotificationRule,
+    RuleFuture,
+)
 from sentry.notifications.utils.digest import get_digest_subject
 from sentry.plugins.base import Notification
 from sentry.replays.testutils import mock_replay
@@ -1543,7 +1548,7 @@ class MailAdapterRuleNotifyTest(BaseMailAdapterTest):
     def test_normal(self, mock_logger: MagicMock) -> None:
         event = self.store_event(data={}, project_id=self.project.id)
         rule = self.create_project_rule(name="my rule")
-        futures = [RuleFuture(rule, {})]
+        futures = [RuleFuture(NotificationRule.from_deprecated_legacy_rule(rule), {})]
         with mock.patch.object(self.adapter, "notify") as notify:
             self.adapter.rule_notify(event, futures, ActionTargetType.ISSUE_OWNERS)
             assert notify.call_count == 1
@@ -1572,7 +1577,7 @@ class MailAdapterRuleNotifyTest(BaseMailAdapterTest):
         event = self.store_event(data={}, project_id=self.project.id)
         rule = self.create_project_rule(project=self.project)
 
-        futures = [RuleFuture(rule, {})]
+        futures = [RuleFuture(NotificationRule.from_deprecated_legacy_rule(rule), {})]
         self.adapter.rule_notify(event, futures, ActionTargetType.ISSUE_OWNERS)
         assert digests.backend.add.call_count == 1
         assert event.group
@@ -1599,14 +1604,14 @@ class MailAdapterRuleNotifyTest(BaseMailAdapterTest):
         event = self.create_performance_issue()
         rule = self.create_project_rule(project=self.project)
 
-        futures = [RuleFuture(rule, {})]
+        futures = [RuleFuture(NotificationRule.from_deprecated_legacy_rule(rule), {})]
         self.adapter.rule_notify(event, futures, ActionTargetType.ISSUE_OWNERS)
         assert digests.backend.add.call_count == 1
 
     def test_notify_includes_uuid(self) -> None:
         event = self.store_event(data={}, project_id=self.project.id)
         rule = self.create_project_rule(name="my rule")
-        futures = [RuleFuture(rule, {})]
+        futures = [RuleFuture(NotificationRule.from_deprecated_legacy_rule(rule), {})]
         notification_uuid = str(uuid.uuid4())
         with mock.patch.object(self.adapter, "notify") as notify:
             self.adapter.rule_notify(
