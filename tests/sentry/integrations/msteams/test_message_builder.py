@@ -117,9 +117,12 @@ class MSTeamsMessageBuilderTest(TestCase):
         assert self.event1.group is not None
         self.group1 = self.event1.group
 
-        self.rules = [
+        persisted_rules = [
             self.create_project_rule(name="rule1"),
             self.create_project_rule(name="rule2"),
+        ]
+        self.rules = [
+            NotificationRule.from_deprecated_legacy_rule(rule) for rule in persisted_rules
         ]
 
     def test_simple(self) -> None:

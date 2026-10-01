@@ -59,6 +59,7 @@ from sentry.models.group import Group
 from sentry.models.organizationmember import InviteStatus, OrganizationMember
 from sentry.models.rule import Rule
 from sentry.notifications.services import notifications_service
+from sentry.notifications.types import NotificationRule
 from sentry.notifications.utils.actions import BlockKitMessageAction, MessageAction
 from sentry.seer.entrypoints.operator import SeerAutofixOperator
 from sentry.seer.entrypoints.slack.entrypoint import SlackAutofixEntrypoint
@@ -136,7 +137,7 @@ def update_group(
     return resp
 
 
-def get_rule(slack_request: SlackActionRequest, organization_id: int) -> Rule | None:
+def get_rule(slack_request: SlackActionRequest, organization_id: int) -> NotificationRule | None:
     """Get the rule that fired"""
     rule_id = slack_request.callback_data.get("rule")
     if not rule_id:
@@ -144,11 +145,9 @@ def get_rule(slack_request: SlackActionRequest, organization_id: int) -> Rule | 
     try:
         # Scope the callback-provided rule ID to the integration-validated organization
         rule = Rule.objects.get(id=rule_id, project__organization_id=organization_id)
-        # We need to add the legacy_rule_id field to the rule data since the message builder will use it to build the link to the rule
-        rule.data["actions"][0]["legacy_rule_id"] = rule.id
     except Rule.DoesNotExist:
         return None
-    return rule
+    return NotificationRule.from_deprecated_legacy_rule(rule)
 
 
 def get_group(slack_request: SlackActionRequest) -> Group | None:

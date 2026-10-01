@@ -51,6 +51,7 @@ from sentry.models.activity import ActivityIntegration
 from sentry.models.apikey import ApiKey
 from sentry.models.group import Group
 from sentry.models.rule import Rule
+from sentry.notifications.types import NotificationRule
 from sentry.services import eventstore
 from sentry.silo.base import SiloMode
 from sentry.users.services.user.service import user_service
@@ -658,7 +659,12 @@ class MsTeamsWebhookEndpoint(Endpoint):
             issue_change_response = self._issue_state_change(group, identity, data["value"])
 
             # get the rules from the payload
-            rules = tuple(Rule.objects.filter(id__in=payload["rules"], project_id=group.project_id))
+            rules = tuple(
+                NotificationRule.from_deprecated_legacy_rule(rule)
+                for rule in Rule.objects.filter(
+                    id__in=payload["rules"], project_id=group.project_id
+                )
+            )
 
             # pull the event based off our payload
             event = None
