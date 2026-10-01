@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-import {Container, Stack} from '@sentry/scraps/layout';
+import {Container, Grid, Stack} from '@sentry/scraps/layout';
 import {ExternalLink} from '@sentry/scraps/link';
 
 import {IconLink} from 'sentry/icons';
@@ -63,14 +63,14 @@ export function EventDataSection({
     >
       <SectionHeader id={type} data-test-id={`event-section-${type}`}>
         {title && (
-          <Title>
+          <Grid columns="max-content 1fr" align="center" gap="xs">
             <Container as="span" width="100%" position="relative" className="permalink">
               <PermalinkAnchor href={`#${type}`} openInNewTab={false}>
                 <StyledIconLink size="xs" variant="muted" />
               </PermalinkAnchor>
               {titleNode}
             </Container>
-          </Title>
+          </Grid>
         )}
         {actions && (
           <Container flexShrink={0} maxWidth="100%">
@@ -82,13 +82,6 @@ export function EventDataSection({
     </Stack>
   );
 }
-
-const Title = styled('div')`
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  align-items: center;
-  gap: ${p => p.theme.space.xs};
-`;
 
 const StyledIconLink = styled(IconLink)`
   opacity: 0;

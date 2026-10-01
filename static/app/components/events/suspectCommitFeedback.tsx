@@ -38,7 +38,7 @@ export function SuspectCommitFeedback({
   if (feedbackSubmitted) {
     return (
       <Flex align="center" gap="xs" display={{zero: 'none', sm: 'flex'}}>
-        <ThankYouText>{t('Thanks!')}</ThankYouText>
+        <FeedbackText>{t('Thanks!')}</FeedbackText>
       </Flex>
     );
   }
@@ -65,13 +65,6 @@ export function SuspectCommitFeedback({
 }
 
 const FeedbackText = styled('span')`
-  font-size: ${p => p.theme.font.size.md};
-  line-height: 1.5;
-  color: ${p => p.theme.tokens.content.secondary};
-  white-space: nowrap;
-`;
-
-const ThankYouText = styled('span')`
   font-size: ${p => p.theme.font.size.md};
   line-height: 1.5;
   color: ${p => p.theme.tokens.content.secondary};

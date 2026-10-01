@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 
 import {InfoTip} from '@sentry/scraps/info';
-import {Flex} from '@sentry/scraps/layout';
+import {Container, Flex, Grid} from '@sentry/scraps/layout';
+import {Text} from '@sentry/scraps/text';
 
 import {getSpanHash} from 'sentry/components/events/interfaces/performance/utils';
 import type {RawSpanType} from 'sentry/components/events/interfaces/spans/types';
@@ -35,22 +36,22 @@ function addFingerprintInfo(
   if ('matched_rule' in variant) {
     data.push([
       t('Fingerprint rule'),
-      <TextWithQuestionTooltip key="type">
+      <Grid key="type" align="center" columns="auto 1fr" gap="xs">
         {variant.matched_rule}
         <InfoTip
           size="xs"
           position="top"
           title={t('The server-side fingerprinting rule that produced the fingerprint.')}
         />
-      </TextWithQuestionTooltip>,
+      </Grid>,
     ]);
   }
   if ('values' in variant) {
     data.push([
       t('Fingerprint values'),
-      <TextWithQuestionTooltip key="fingerprint-values">
+      <Grid key="fingerprint-values" align="center" columns="auto 1fr" gap="xs">
         {variant.values?.join(', ') || ''}
-      </TextWithQuestionTooltip>,
+      </Grid>,
     ]);
   }
   if (
@@ -59,14 +60,14 @@ function addFingerprintInfo(
   ) {
     data.push([
       t('Client fingerprint values'),
-      <TextWithQuestionTooltip key="type">
+      <Grid key="type" align="center" columns="auto 1fr" gap="xs">
         {variant.client_values?.join(', ') || ''}
         {'matched_rule' in variant && (
           <GroupingHint>
             {`(${t('overridden by server-side fingerprint rule')})`}
           </GroupingHint>
         )}
-      </TextWithQuestionTooltip>,
+      </Grid>,
     ]);
   }
 }
@@ -138,12 +139,12 @@ export function GroupingVariant({
     if (component) {
       data.push([
         t('Grouping'),
-        <GroupingTree key={component.id}>
+        <Text as="div" key={component.id} variant="primary">
           <GroupingComponent
             component={component}
             showNonContributing={showNonContributing}
           />
-        </GroupingTree>,
+        </Text>,
       ]);
     }
 
@@ -163,7 +164,7 @@ export function GroupingVariant({
 
   const data = getVariantData();
   return (
-    <VariantWrapper>
+    <Container marginBottom="3xl">
       <Flex
         align={{zero: 'stretch', xl: 'center'}}
         justify="between"
@@ -194,13 +195,9 @@ export function GroupingVariant({
         isContextData
         shouldSort={false}
       />
-    </VariantWrapper>
+    </Container>
   );
 }
-
-const VariantWrapper = styled('div')`
-  margin-bottom: ${p => p.theme.space['3xl']};
-`;
 
 const VariantTitle = styled('h5')`
   font-size: ${p => p.theme.font.size.md};
@@ -225,17 +222,6 @@ const ContributionIcon = styled(
     )
 )`
   margin-right: ${p => p.theme.space.md};
-`;
-
-const GroupingTree = styled('div')`
-  color: ${p => p.theme.tokens.content.primary};
-`;
-
-const TextWithQuestionTooltip = styled('div')`
-  display: grid;
-  align-items: center;
-  grid-template-columns: auto 1fr;
-  gap: ${p => p.theme.space.xs};
 `;
 
 const Hash = styled('span')`

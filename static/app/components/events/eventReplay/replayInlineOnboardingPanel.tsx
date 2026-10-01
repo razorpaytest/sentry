@@ -6,6 +6,7 @@ import {Button} from '@sentry/scraps/button';
 import {DropdownMenu} from '@sentry/scraps/dropdownMenu';
 import {Flex, Container} from '@sentry/scraps/layout';
 import {OverlayTrigger} from '@sentry/scraps/overlayTrigger';
+import {Text} from '@sentry/scraps/text';
 
 import {usePrompt} from 'sentry/actionCreators/prompts';
 import {otherPlatform, allPlatforms as platforms} from 'sentry/data/platforms';
@@ -46,13 +47,25 @@ export default function ReplayInlineOnboardingPanel({
 
   return (
     <FoldSection sectionKey={SectionKey.REPLAY} title={t('Session Replay')}>
-      <BannerWrapper>
+      <BannerWrapper
+        position="relative"
+        border="primary"
+        radius="md"
+        padding="xl"
+        margin="md 0"
+      >
         <div>
-          <BannerTitle>
-            {tct('Set up your [platform] app with Session Replay', {
-              platform: <PurpleText>{platformName}</PurpleText>,
-            })}
-          </BannerTitle>
+          <Container marginBottom="md">
+            <Text as="div" size="xl" bold>
+              {tct('Set up your [platform] app with Session Replay', {
+                platform: (
+                  <Text as="span" variant="accent" bold>
+                    {platformName}
+                  </Text>
+                ),
+              })}
+            </Text>
+          </Container>
           <Container marginBottom="lg" maxWidth="340px">
             {t('Watch the errors and latency issues your users face')}
           </Container>
@@ -67,7 +80,17 @@ export default function ReplayInlineOnboardingPanel({
             </Button>
           </Flex>
         </div>
-        <Background image={replayInlineOnboarding} display={{zero: 'none', xl: 'flex'}} />
+        <Background
+          image={replayInlineOnboarding}
+          display={{zero: 'none', xl: 'flex'}}
+          justifySelf="end"
+          position="absolute"
+          top="0"
+          right="25px"
+          height="100%"
+          width="100%"
+          maxWidth="250px"
+        />
         <CloseDropdownMenu
           position="bottom-end"
           trigger={triggerProps => (
@@ -109,29 +132,13 @@ export default function ReplayInlineOnboardingPanel({
   );
 }
 
-const PurpleText = styled('span')`
-  color: ${p => p.theme.tokens.content.accent};
-  font-weight: ${p => p.theme.font.weight.sans.medium};
-`;
-
-const BannerWrapper = styled('div')`
-  position: relative;
-  border: 1px solid ${p => p.theme.tokens.border.primary};
-  border-radius: ${p => p.theme.radius.md};
-  padding: ${p => p.theme.space.xl};
-  margin: ${p => p.theme.space.md} 0;
+const BannerWrapper = styled(Container)`
   background: linear-gradient(
     90deg,
     color-mix(in srgb, ${p => p.theme.tokens.background.secondary} 0%, transparent) 0%,
     ${p => p.theme.tokens.background.secondary} 70%,
     ${p => p.theme.tokens.background.secondary} 100%
   );
-`;
-
-const BannerTitle = styled('div')`
-  font-size: ${p => p.theme.font.size.xl};
-  margin-bottom: ${p => p.theme.space.md};
-  font-weight: ${p => p.theme.font.weight.sans.medium};
 `;
 
 const CloseDropdownMenu = styled(DropdownMenu)`
@@ -145,13 +152,6 @@ const CloseDropdownMenu = styled(DropdownMenu)`
 `;
 
 const Background = styled(Container)<{image: string}>`
-  justify-self: flex-end;
-  position: absolute;
-  top: 0px;
-  right: 25px;
-  height: 100%;
-  width: 100%;
-  max-width: 250px;
   background-image: url(${p => p.image});
   background-repeat: no-repeat;
   background-size: contain;

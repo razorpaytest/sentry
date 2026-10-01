@@ -5,6 +5,7 @@ import {useQuery} from '@tanstack/react-query';
 import {Button} from '@sentry/scraps/button';
 import {useDrawer} from '@sentry/scraps/drawer';
 import {Container, Grid, useResponsivePropValue} from '@sentry/scraps/layout';
+import {Text} from '@sentry/scraps/text';
 
 import {AnalyticsArea} from 'sentry/components/analyticsArea';
 import {EmptyStateWarning} from 'sentry/components/emptyStateWarning';
@@ -136,10 +137,16 @@ function BaseEventFeatureFlagList({event, group, project}: EventFeatureFlagSecti
           key: f.flag,
           subject: f.flag,
           value: (
-            <ValueWrapper>
+            <ValueWrapper
+              columns={{zero: '1fr 0.5fr', sm: '1fr 1fr 0.5fr'}}
+              rows={{zero: 'auto auto', sm: 'auto'}}
+              justifyItems="start"
+            >
               {f.result.toString()}
               {suspectFlagNames.has(f.flag) && (
-                <SuspectLabel>{t('Suspect')}</SuspectLabel>
+                <Text as="div" variant="secondary" className="suspect-label">
+                  {t('Suspect')}
+                </Text>
               )}
               <FlagActionDropdown
                 flag={f.flag}
@@ -309,21 +316,10 @@ const StyledEmptyStateWarning = styled(EmptyStateWarning)`
   align-items: center;
 `;
 
-const SuspectLabel = styled('div')`
-  color: ${p => p.theme.tokens.content.secondary};
-`;
-
-const ValueWrapper = styled('div')`
-  display: grid;
-  grid-template-columns: 1fr 1fr 0.5fr;
-  justify-items: start;
-
-  @container (max-width: ${p => p.theme.container.sm}) {
-    grid-template-columns: 1fr 0.5fr;
-    grid-template-rows: auto auto;
-
+const ValueWrapper = styled(Grid)`
+  @container (width < ${p => p.theme.container.sm}) {
     /* Move suspect label to second row, spanning full width */
-    ${SuspectLabel} {
+    .suspect-label {
       grid-column: 1 / -1;
       grid-row: 2;
     }

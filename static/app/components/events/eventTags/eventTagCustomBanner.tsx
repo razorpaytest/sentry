@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import onboardingSetup from 'sentry-images/spot/onboarding-setup.svg';
 
 import {LinkButton} from '@sentry/scraps/button';
+import {Container, Flex} from '@sentry/scraps/layout';
+import {Text} from '@sentry/scraps/text';
 
 import {TAGS_DOCS_LINK} from 'sentry/components/events/eventTags/util';
 import {Panel} from 'sentry/components/panels/panel';
@@ -14,16 +16,20 @@ export function EventTagCustomBanner() {
     <Wrapper data-test-id="event-tags-custom-banner">
       <Body>
         <div>
-          <Title>{t('Debug better with custom tags')}</Title>
+          <Container marginBottom="md">
+            <Text as="div" size="xl" bold>
+              {t('Debug better with custom tags')}
+            </Text>
+          </Container>
           <SubTitle>
             {t('Include relevant metadata for debugging on events you send to Sentry')}
           </SubTitle>
         </div>
-        <ContextArea>
+        <Flex gap="md" marginTop="md">
           <LinkButton size="sm" href={TAGS_DOCS_LINK} external>
             {t('Learn More')}
           </LinkButton>
-        </ContextArea>
+        </Flex>
       </Body>
       <SentaurIllustration src={onboardingSetup} />
     </Wrapper>
@@ -48,20 +54,8 @@ const Body = styled(PanelBody)`
   max-width: 350px;
 `;
 
-const Title = styled('div')`
-  font-size: ${p => p.theme.font.size.xl};
-  font-weight: ${p => p.theme.font.weight.sans.medium};
-  margin-bottom: ${p => p.theme.space.md};
-`;
-
 const SubTitle = styled('p')`
   margin: ${p => p.theme.space.md} 0;
-`;
-
-const ContextArea = styled('div')`
-  display: flex;
-  gap: ${p => p.theme.space.md};
-  margin-top: ${p => p.theme.space.md};
 `;
 
 const SentaurIllustration = styled('img')`
