@@ -1,11 +1,10 @@
-import {useTheme} from '@emotion/react';
 import styled from '@emotion/styled';
 
 import replayInlineOnboarding from 'sentry-images/spot/replay-inline-onboarding-v2.svg';
 
 import {Button} from '@sentry/scraps/button';
 import {DropdownMenu} from '@sentry/scraps/dropdownMenu';
-import {Flex, Container} from '@sentry/scraps/layout';
+import {Flex, Container, useResponsivePropValue} from '@sentry/scraps/layout';
 import {OverlayTrigger} from '@sentry/scraps/overlayTrigger';
 
 import {usePrompt} from 'sentry/actionCreators/prompts';
@@ -15,7 +14,6 @@ import {t, tct} from 'sentry/locale';
 import type {PlatformKey} from 'sentry/types/platform';
 import {trackAnalytics} from 'sentry/utils/analytics';
 import {useReplayOnboardingSidebarPanel} from 'sentry/utils/replays/hooks/useReplayOnboarding';
-import {useMedia} from 'sentry/utils/useMedia';
 import {useOrganization} from 'sentry/utils/useOrganization';
 import {SectionKey} from 'sentry/views/issueDetails/context';
 import {FoldSection} from 'sentry/views/issueDetails/foldSection';
@@ -29,13 +27,12 @@ export default function ReplayInlineOnboardingPanel({
   platform,
   projectId,
 }: OnboardingCTAProps) {
-  const theme = useTheme();
   const organization = useOrganization();
   const {activateSidebar} = useReplayOnboardingSidebarPanel();
 
   const platformKey = platforms.find(p => p.id === platform) ?? otherPlatform;
   const platformName = platformKey === otherPlatform ? '' : platformKey.name;
-  const isScreenSmall = useMedia(`(max-width: ${theme.breakpoints.sm})`);
+  const isContainerSmall = useResponsivePropValue({zero: true, xl: false});
 
   const {isLoading, isError, isPromptDismissed, dismissPrompt, snoozePrompt} = usePrompt({
     feature: 'issue_replay_inline_onboarding',
@@ -71,7 +68,7 @@ export default function ReplayInlineOnboardingPanel({
             </Button>
           </Flex>
         </div>
-        {!isScreenSmall && <Background image={replayInlineOnboarding} />}
+        {!isContainerSmall && <Background image={replayInlineOnboarding} />}
         <CloseDropdownMenu
           position="bottom-end"
           trigger={triggerProps => (

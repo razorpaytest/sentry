@@ -164,7 +164,14 @@ export function GroupingVariant({
   const data = getVariantData();
   return (
     <VariantWrapper>
-      <Header>{title}</Header>
+      <Flex
+        align={{zero: 'stretch', xl: 'center'}}
+        justify="between"
+        marginBottom="xl"
+        direction={{zero: 'column', xl: 'row'}}
+      >
+        {title}
+      </Flex>
 
       <KeyValueTableDataList
         margin
@@ -193,16 +200,6 @@ export function GroupingVariant({
 
 const VariantWrapper = styled('div')`
   margin-bottom: ${p => p.theme.space['3xl']};
-`;
-
-const Header = styled('div')`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: ${p => p.theme.space.xl};
-  @media (max-width: ${p => p.theme.breakpoints.sm}) {
-    display: block;
-  }
 `;
 
 const VariantTitle = styled('h5')`
@@ -242,7 +239,7 @@ const TextWithQuestionTooltip = styled('div')`
 `;
 
 const Hash = styled('span')`
-  @media (max-width: ${p => p.theme.breakpoints.sm}) {
+  @container (max-width: ${p => p.theme.container.xl}) {
     display: block;
     white-space: nowrap;
     overflow: hidden;
