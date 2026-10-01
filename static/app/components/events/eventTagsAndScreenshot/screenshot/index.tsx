@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 
 import {Button} from '@sentry/scraps/button';
 import {DropdownMenu} from '@sentry/scraps/dropdownMenu';
-import {Flex, Grid} from '@sentry/scraps/layout';
+import {Flex, Grid, Stack} from '@sentry/scraps/layout';
 import {OverlayTrigger} from '@sentry/scraps/overlayTrigger';
 
 import {useRole} from 'sentry/components/acl/useRole';
@@ -77,116 +77,119 @@ export function Screenshot({
   const downloadUrl = `/api/0/projects/${organization.slug}/${projectSlug}/events/${eventId}/attachments/${screenshot.id}/`;
 
   return (
-    <StyledPanel>
-      {totalScreenshots > 1 && (
-        <StyledPanelHeader lightText>
-          <Button
-            disabled={screenshotInFocus === 0}
-            aria-label={t('Previous Screenshot')}
-            onClick={onPrevious}
-            icon={<IconChevron direction="left" />}
-            size="xs"
-          />
-          {tct('[currentScreenshot] of [totalScreenshots]', {
-            currentScreenshot: screenshotInFocus + 1,
-            totalScreenshots,
-          })}
-          <Button
-            disabled={screenshotInFocus + 1 === totalScreenshots}
-            aria-label={t('Next Screenshot')}
-            onClick={onNext}
-            icon={<IconChevron direction="right" />}
-            size="xs"
-          />
-        </StyledPanelHeader>
-      )}
-      <StyledPanelBody hasHeader={totalScreenshots > 1}>
-        {loadingImage && (
-          <Flex justify="center" align="center" height="100%" position="absolute">
-            <LoadingIndicator mini />
-          </Flex>
+    <Panel
+      css={theme => css`
+        margin-bottom: 0;
+        max-width: 100%;
+        height: 100%;
+        border: 0;
+
+        @container (min-width: ${theme.container.xl}) {
+          max-width: 175px;
+        }
+      `}
+    >
+      <Stack justify="center" align="center" height="100%">
+        {totalScreenshots > 1 && (
+          <StyledPanelHeader lightText>
+            <Button
+              disabled={screenshotInFocus === 0}
+              aria-label={t('Previous Screenshot')}
+              onClick={onPrevious}
+              icon={<IconChevron direction="left" />}
+              size="xs"
+            />
+            {tct('[currentScreenshot] of [totalScreenshots]', {
+              currentScreenshot: screenshotInFocus + 1,
+              totalScreenshots,
+            })}
+            <Button
+              disabled={screenshotInFocus + 1 === totalScreenshots}
+              aria-label={t('Next Screenshot')}
+              onClick={onNext}
+              icon={<IconChevron direction="right" />}
+              size="xs"
+            />
+          </StyledPanelHeader>
         )}
-        <AttachmentComponentWrapper
-          onClick={() => openVisualizationModal(screenshot, `${downloadUrl}?download=1`)}
-        >
-          <AttachmentComponent
-            orgSlug={organization.slug}
-            projectSlug={projectSlug}
-            eventId={eventId}
-            attachment={screenshot}
-            onLoad={() => setLoadingImage(false)}
-            onError={() => setLoadingImage(false)}
-            controls={false}
-            onCanPlay={() => setLoadingImage(false)}
-          />
-        </AttachmentComponentWrapper>
-      </StyledPanelBody>
-      <StyledPanelFooter>
-        <Grid flow="column" align="center" gap="md">
-          <Button
-            size="xs"
+        <StyledPanelBody hasHeader={totalScreenshots > 1}>
+          {loadingImage && (
+            <Flex justify="center" align="center" height="100%" position="absolute">
+              <LoadingIndicator mini />
+            </Flex>
+          )}
+          <AttachmentComponentWrapper
             onClick={() =>
               openVisualizationModal(screenshot, `${downloadUrl}?download=1`)
             }
           >
-            {t('View screenshot')}
-          </Button>
-          <DropdownMenu
-            position="bottom"
-            offset={4}
-            trigger={triggerProps => (
-              <OverlayTrigger.IconButton
-                {...triggerProps}
-                icon={<IconEllipsis />}
-                aria-label={t('More screenshot actions')}
-              />
-            )}
-            size="xs"
-            items={[
-              {
-                key: 'download',
-                label: t('Download'),
-                onAction: () => {
-                  window.location.assign(`${downloadUrl}?download=1`);
-                  trackAnalytics('issue_details.issue_tab.screenshot_dropdown_download', {
-                    organization,
-                  });
+            <AttachmentComponent
+              orgSlug={organization.slug}
+              projectSlug={projectSlug}
+              eventId={eventId}
+              attachment={screenshot}
+              onLoad={() => setLoadingImage(false)}
+              onError={() => setLoadingImage(false)}
+              controls={false}
+              onCanPlay={() => setLoadingImage(false)}
+            />
+          </AttachmentComponentWrapper>
+        </StyledPanelBody>
+        <StyledPanelFooter>
+          <Grid flow="column" align="center" gap="md">
+            <Button
+              size="xs"
+              onClick={() =>
+                openVisualizationModal(screenshot, `${downloadUrl}?download=1`)
+              }
+            >
+              {t('View screenshot')}
+            </Button>
+            <DropdownMenu
+              position="bottom"
+              offset={4}
+              trigger={triggerProps => (
+                <OverlayTrigger.IconButton
+                  {...triggerProps}
+                  icon={<IconEllipsis />}
+                  aria-label={t('More screenshot actions')}
+                />
+              )}
+              size="xs"
+              items={[
+                {
+                  key: 'download',
+                  label: t('Download'),
+                  onAction: () => {
+                    window.location.assign(`${downloadUrl}?download=1`);
+                    trackAnalytics(
+                      'issue_details.issue_tab.screenshot_dropdown_download',
+                      {
+                        organization,
+                      }
+                    );
+                  },
                 },
-              },
-              {
-                key: 'delete',
-                label: t('Delete'),
-                onAction: () =>
-                  openConfirmModal({
-                    header: t('Delete this image?'),
-                    message: t(
-                      'This image was captured around the time that the event occurred. Are you sure you want to delete this image?'
-                    ),
-                    onConfirm: () => handleDelete(screenshot.id),
-                  }),
-              },
-            ]}
-          />
-        </Grid>
-      </StyledPanelFooter>
-    </StyledPanel>
+                {
+                  key: 'delete',
+                  label: t('Delete'),
+                  onAction: () =>
+                    openConfirmModal({
+                      header: t('Delete this image?'),
+                      message: t(
+                        'This image was captured around the time that the event occurred. Are you sure you want to delete this image?'
+                      ),
+                      onConfirm: () => handleDelete(screenshot.id),
+                    }),
+                },
+              ]}
+            />
+          </Grid>
+        </StyledPanelFooter>
+      </Stack>
+    </Panel>
   );
 }
-
-const StyledPanel = styled(Panel)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 0;
-  max-width: 100%;
-  height: 100%;
-  border: 0;
-
-  @container (min-width: ${p => p.theme.container.xl}) {
-    max-width: 175px;
-  }
-`;
 
 const StyledPanelHeader = styled(PanelHeader)`
   padding: ${p => p.theme.space.md};

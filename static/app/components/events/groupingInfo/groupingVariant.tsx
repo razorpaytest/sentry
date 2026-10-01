@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
+import {css} from '@emotion/react';
 
 import {InfoTip} from '@sentry/scraps/info';
-import {Container, Flex, Grid} from '@sentry/scraps/layout';
-import {Text} from '@sentry/scraps/text';
+import {Flex, Grid, Stack} from '@sentry/scraps/layout';
+import {Heading, Text} from '@sentry/scraps/text';
 
 import {getSpanHash} from 'sentry/components/events/interfaces/performance/utils';
 import type {RawSpanType} from 'sentry/components/events/interfaces/spans/types';
@@ -86,7 +86,24 @@ export function GroupingVariant({
     }
 
     if (variant.hash !== null) {
-      data.push([t('Hash'), <Hash key="hash">{variant.hash}</Hash>]);
+      data.push([
+        t('Hash'),
+        <Text
+          as="span"
+          key="hash"
+          css={theme => css`
+            @container (max-width: ${theme.container.xl}) {
+              display: block;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              width: 210px;
+            }
+          `}
+        >
+          {variant.hash}
+        </Text>,
+      ]);
     }
 
     if (variant.hashMismatch) {
@@ -152,23 +169,34 @@ export function GroupingVariant({
   };
 
   const title = (
-    <VariantTitle>
-      <ContributionIcon isContributing={variant.contributes} />
-      {variant.description
-        ?.split(' ')
-        .map(i => capitalize(i))
-        .join(' ') ?? t('Nothing')}
-      <VariantHint>{variant.hint && t('(%s)', variant.hint)}</VariantHint>
-    </VariantTitle>
+    <Heading as="h5" size="md">
+      <Flex align="center" gap="md">
+        {variant.contributes ? (
+          <IconCheckmark size="sm" variant="success" />
+        ) : (
+          <IconClose size="sm" variant="danger" />
+        )}
+        <Flex align="center" gap="xs">
+          {variant.description
+            ?.split(' ')
+            .map(i => capitalize(i))
+            .join(' ') ?? t('Nothing')}
+          {variant.hint && (
+            <Text as="span" size="sm" variant="secondary">
+              {t('(%s)', variant.hint)}
+            </Text>
+          )}
+        </Flex>
+      </Flex>
+    </Heading>
   );
 
   const data = getVariantData();
   return (
-    <Container marginBottom="3xl">
+    <Stack gap="xl" marginBottom="3xl">
       <Flex
         align={{zero: 'stretch', xl: 'center'}}
         justify="between"
-        marginBottom="xl"
         direction={{zero: 'column', xl: 'row'}}
       >
         {title}
@@ -195,41 +223,6 @@ export function GroupingVariant({
         isContextData
         shouldSort={false}
       />
-    </Container>
+    </Stack>
   );
 }
-
-const VariantTitle = styled('h5')`
-  font-size: ${p => p.theme.font.size.md};
-  margin: 0;
-  display: flex;
-  align-items: center;
-`;
-
-const VariantHint = styled('span')`
-  font-size: ${p => p.theme.font.size.sm};
-  margin-left: ${p => p.theme.space.xs};
-  font-weight: ${p => p.theme.font.weight.sans.regular};
-  color: ${p => p.theme.tokens.content.secondary};
-`;
-
-const ContributionIcon = styled(
-  ({isContributing, ...p}: {isContributing: boolean; className?: string}) =>
-    isContributing ? (
-      <IconCheckmark size="sm" variant="success" {...p} />
-    ) : (
-      <IconClose size="sm" variant="danger" {...p} />
-    )
-)`
-  margin-right: ${p => p.theme.space.md};
-`;
-
-const Hash = styled('span')`
-  @container (max-width: ${p => p.theme.container.xl}) {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 210px;
-  }
-`;

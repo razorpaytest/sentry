@@ -1,4 +1,5 @@
 import {Fragment, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {css} from '@emotion/react';
 import styled from '@emotion/styled';
 import {useQuery} from '@tanstack/react-query';
 
@@ -137,10 +138,29 @@ function BaseEventFeatureFlagList({event, group, project}: EventFeatureFlagSecti
           key: f.flag,
           subject: f.flag,
           value: (
-            <ValueWrapper
+            <Grid
               columns={{zero: '1fr 0.5fr', sm: '1fr 1fr 0.5fr'}}
               rows={{zero: 'auto auto', sm: 'auto'}}
               justifyItems="start"
+              css={theme => css`
+                @container (width < ${theme.container.sm}) {
+                  /* Move suspect label to second row, spanning full width */
+                  .suspect-label {
+                    grid-column: 1 / -1;
+                    grid-row: 2;
+                  }
+                }
+
+                .invisible {
+                  visibility: hidden;
+                }
+                &:hover,
+                &:active {
+                  .invisible .flag-button {
+                    visibility: visible;
+                  }
+                }
+              `}
             >
               {f.result.toString()}
               {suspectFlagNames.has(f.flag) && (
@@ -153,7 +173,7 @@ function BaseEventFeatureFlagList({event, group, project}: EventFeatureFlagSecti
                 result={f.result.toString()}
                 generateAction={generateAction}
               />
-            </ValueWrapper>
+            </Grid>
           ),
         },
         isSuspectFlag: suspectFlagNames.has(f.flag),
@@ -314,24 +334,4 @@ const StyledEmptyStateWarning = styled(EmptyStateWarning)`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const ValueWrapper = styled(Grid)`
-  @container (width < ${p => p.theme.container.sm}) {
-    /* Move suspect label to second row, spanning full width */
-    .suspect-label {
-      grid-column: 1 / -1;
-      grid-row: 2;
-    }
-  }
-
-  .invisible {
-    visibility: hidden;
-  }
-  &:hover,
-  &:active {
-    .invisible .flag-button {
-      visibility: visible;
-    }
-  }
 `;

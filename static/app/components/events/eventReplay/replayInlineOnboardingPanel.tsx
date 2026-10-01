@@ -1,10 +1,12 @@
+import {css} from '@emotion/react';
 import styled from '@emotion/styled';
 
 import replayInlineOnboarding from 'sentry-images/spot/replay-inline-onboarding-v2.svg';
 
 import {Button} from '@sentry/scraps/button';
 import {DropdownMenu} from '@sentry/scraps/dropdownMenu';
-import {Flex, Container} from '@sentry/scraps/layout';
+import {Image} from '@sentry/scraps/image';
+import {Container, Flex, Stack} from '@sentry/scraps/layout';
 import {OverlayTrigger} from '@sentry/scraps/overlayTrigger';
 import {Text} from '@sentry/scraps/text';
 
@@ -47,15 +49,23 @@ export default function ReplayInlineOnboardingPanel({
 
   return (
     <FoldSection sectionKey={SectionKey.REPLAY} title={t('Session Replay')}>
-      <BannerWrapper
+      <Container
         position="relative"
         border="primary"
         radius="md"
         padding="xl"
         margin="md 0"
+        css={theme => css`
+          background: linear-gradient(
+            90deg,
+            color-mix(in srgb, ${theme.tokens.background.secondary} 0%, transparent) 0%,
+            ${theme.tokens.background.secondary} 70%,
+            ${theme.tokens.background.secondary} 100%
+          );
+        `}
       >
-        <div>
-          <Container marginBottom="md">
+        <Stack gap="lg">
+          <Stack gap="md">
             <Text as="div" size="xl" bold>
               {tct('Set up your [platform] app with Session Replay', {
                 platform: (
@@ -65,10 +75,10 @@ export default function ReplayInlineOnboardingPanel({
                 ),
               })}
             </Text>
-          </Container>
-          <Container marginBottom="lg" maxWidth="340px">
-            {t('Watch the errors and latency issues your users face')}
-          </Container>
+            <Container maxWidth="340px">
+              {t('Watch the errors and latency issues your users face')}
+            </Container>
+          </Stack>
           <Flex gap="md">
             <Button
               analyticsEventName="Clicked Replay Onboarding CTA Set Up Button in Issue Details"
@@ -79,9 +89,8 @@ export default function ReplayInlineOnboardingPanel({
               {t('Set Up Now')}
             </Button>
           </Flex>
-        </div>
-        <Background
-          image={replayInlineOnboarding}
+        </Stack>
+        <Container
           display={{zero: 'none', xl: 'flex'}}
           justifySelf="end"
           position="absolute"
@@ -90,7 +99,15 @@ export default function ReplayInlineOnboardingPanel({
           height="100%"
           width="100%"
           maxWidth="250px"
-        />
+        >
+          <Image
+            src={replayInlineOnboarding}
+            alt=""
+            width="100%"
+            height="100%"
+            objectFit="contain"
+          />
+        </Container>
         <CloseDropdownMenu
           position="bottom-end"
           trigger={triggerProps => (
@@ -127,19 +144,10 @@ export default function ReplayInlineOnboardingPanel({
             },
           ]}
         />
-      </BannerWrapper>
+      </Container>
     </FoldSection>
   );
 }
-
-const BannerWrapper = styled(Container)`
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, ${p => p.theme.tokens.background.secondary} 0%, transparent) 0%,
-    ${p => p.theme.tokens.background.secondary} 70%,
-    ${p => p.theme.tokens.background.secondary} 100%
-  );
-`;
 
 const CloseDropdownMenu = styled(DropdownMenu)`
   position: absolute;
@@ -149,10 +157,4 @@ const CloseDropdownMenu = styled(DropdownMenu)`
   color: ${p => p.theme.colors.white};
   cursor: pointer;
   z-index: 1;
-`;
-
-const Background = styled(Container)<{image: string}>`
-  background-image: url(${p => p.image});
-  background-repeat: no-repeat;
-  background-size: contain;
 `;
