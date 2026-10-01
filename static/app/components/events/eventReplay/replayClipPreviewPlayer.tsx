@@ -90,7 +90,6 @@ export function ReplayClipPreviewPlayer({
 
         return (
           <FluidHeight
-            data-test-id="player-container"
             position="relative"
             maxHeight={`${REPLAY_LOADING_HEIGHT + 16}px`}
             minHeight={{xl: `${REPLAY_LOADING_HEIGHT + 16}px`}}
