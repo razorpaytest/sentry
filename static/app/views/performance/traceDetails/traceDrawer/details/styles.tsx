@@ -21,7 +21,6 @@ import {ClippedBox} from 'sentry/components/clippedBox';
 import {CopyToClipboardButton} from 'sentry/components/copyToClipboardButton';
 import {EventTagsDataSection} from 'sentry/components/events/eventTagsAndScreenshot/tags';
 import {generateStats} from 'sentry/components/events/opsBreakdown';
-import {DataSection} from 'sentry/components/events/styles';
 import ProjectBadge from 'sentry/components/idBadge/projectBadge';
 import {type LazyRenderProps} from 'sentry/components/lazyRender';
 import {Panel} from 'sentry/components/panels/panel';
@@ -97,7 +96,7 @@ const BodyContainer = styled('div')`
   overflow-y: auto;
   overflow-x: hidden;
 
-  ${DataSection} {
+  [data-event-data-section] {
     padding: 0;
   }
 `;

@@ -1,9 +1,8 @@
 import styled from '@emotion/styled';
 
-import {Container} from '@sentry/scraps/layout';
+import {Container, Stack} from '@sentry/scraps/layout';
 import {ExternalLink} from '@sentry/scraps/link';
 
-import {DataSection} from 'sentry/components/events/styles';
 import {IconLink} from 'sentry/icons';
 
 interface EventDataSectionProps {
@@ -55,7 +54,13 @@ export function EventDataSection({
   const titleNode = <h3>{title}</h3>;
 
   return (
-    <DataSection ref={scrollToSection} className={className || ''} {...props}>
+    <Stack
+      ref={scrollToSection}
+      className={className || ''}
+      data-event-data-section
+      padding={{zero: 'md xl', '3xl': 'lg 3xl'}}
+      {...props}
+    >
       <SectionHeader id={type} data-test-id={`event-section-${type}`}>
         {title && (
           <Title>
@@ -74,7 +79,7 @@ export function EventDataSection({
         )}
       </SectionHeader>
       <Container position="relative">{children}</Container>
-    </DataSection>
+    </Stack>
   );
 }
 
