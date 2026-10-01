@@ -67,6 +67,27 @@ class TestNestedRecursion:
         checker.compare(old, new, frozenset())
         assert checker.mismatches == ["event.msg: old=str(len=5), new=str(len=5)"]
 
+    def test_bool_does_not_match_int(self) -> None:
+        old = {"flag": 1, "items": [0]}
+        new = {"flag": True, "items": [False]}
+        checker = ParityChecker(format_value=repr)
+        checker.compare(old, new, frozenset())
+        assert checker.mismatches == [
+            "flag: old=1, new=True",
+            "items[0]: old=0, new=False",
+        ]
+
+    def test_mismatches_are_ordered_by_key(self) -> None:
+        old = {"z": 1, "a": 1, "m": 1}
+        new = {"m": 2, "z": 2, "a": 2}
+        checker = ParityChecker(format_value=repr)
+        checker.compare(old, new, frozenset())
+        assert checker.mismatches == [
+            "a: old=1, new=2",
+            "m: old=1, new=2",
+            "z: old=1, new=2",
+        ]
+
 
 class TestUnreliable:
     def test_ignores_difference(self) -> None:
