@@ -4,7 +4,7 @@ import {useQuery} from '@tanstack/react-query';
 
 import {Button} from '@sentry/scraps/button';
 import {useDrawer} from '@sentry/scraps/drawer';
-import {Grid, useResponsivePropValue} from '@sentry/scraps/layout';
+import {Container, Grid, useResponsivePropValue} from '@sentry/scraps/layout';
 
 import {AnalyticsArea} from 'sentry/components/analyticsArea';
 import {EmptyStateWarning} from 'sentry/components/emptyStateWarning';
@@ -56,21 +56,6 @@ type EventFeatureFlagSectionProps = {
 function BaseEventFeatureFlagList({event, group, project}: EventFeatureFlagSectionProps) {
   const organization = useOrganization();
   const isContainerSmall = useResponsivePropValue({zero: true, sm: false});
-
-  const feedbackButton = isContainerSmall ? null : (
-    <FeedbackButton
-      variant="secondary"
-      aria-label={t('Give feedback on the feature flag section')}
-      size="xs"
-      feedbackOptions={{
-        messagePlaceholder: t('How can we make feature flags work better for you?'),
-        tags: {
-          'feedback.source': 'issue_details_feature_flags',
-          'feedback.owner': 'replay',
-        },
-      }}
-    />
-  );
 
   const [orderBy, setOrderBy] = useState(OrderBy.NEWEST);
   const {closeDrawer, isDrawerOpen, openDrawer} = useDrawer();
@@ -224,7 +209,20 @@ function BaseEventFeatureFlagList({event, group, project}: EventFeatureFlagSecti
 
   const actions = (
     <Grid flow="column" align="center" gap="md">
-      {feedbackButton}
+      <Container display={{zero: 'none', sm: 'block'}}>
+        <FeedbackButton
+          variant="secondary"
+          aria-label={t('Give feedback on the feature flag section')}
+          size="xs"
+          feedbackOptions={{
+            messagePlaceholder: t('How can we make feature flags work better for you?'),
+            tags: {
+              'feedback.source': 'issue_details_feature_flags',
+              'feedback.owner': 'replay',
+            },
+          }}
+        />
+      </Container>
       <FeatureFlagSettingsButton orgSlug={organization.slug} />
       {hasFlags && (
         <Fragment>

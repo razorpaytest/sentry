@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 
-export const DataSection = styled('div')`
-  display: flex;
-  flex-direction: column;
+import {Stack} from '@sentry/scraps/layout';
+
+export const DataSection = styled(Stack)`
   margin: 0;
 
   /* Padding aligns with Layout.Body */

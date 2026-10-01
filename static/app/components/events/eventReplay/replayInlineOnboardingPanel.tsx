@@ -4,7 +4,7 @@ import replayInlineOnboarding from 'sentry-images/spot/replay-inline-onboarding-
 
 import {Button} from '@sentry/scraps/button';
 import {DropdownMenu} from '@sentry/scraps/dropdownMenu';
-import {Flex, Container, useResponsivePropValue} from '@sentry/scraps/layout';
+import {Flex, Container} from '@sentry/scraps/layout';
 import {OverlayTrigger} from '@sentry/scraps/overlayTrigger';
 
 import {usePrompt} from 'sentry/actionCreators/prompts';
@@ -32,7 +32,6 @@ export default function ReplayInlineOnboardingPanel({
 
   const platformKey = platforms.find(p => p.id === platform) ?? otherPlatform;
   const platformName = platformKey === otherPlatform ? '' : platformKey.name;
-  const isContainerSmall = useResponsivePropValue({zero: true, xl: false});
 
   const {isLoading, isError, isPromptDismissed, dismissPrompt, snoozePrompt} = usePrompt({
     feature: 'issue_replay_inline_onboarding',
@@ -68,7 +67,7 @@ export default function ReplayInlineOnboardingPanel({
             </Button>
           </Flex>
         </div>
-        {!isContainerSmall && <Background image={replayInlineOnboarding} />}
+        <Background image={replayInlineOnboarding} display={{zero: 'none', xl: 'flex'}} />
         <CloseDropdownMenu
           position="bottom-end"
           trigger={triggerProps => (
@@ -145,8 +144,7 @@ const CloseDropdownMenu = styled(DropdownMenu)`
   z-index: 1;
 `;
 
-const Background = styled('div')<{image: any}>`
-  display: flex;
+const Background = styled(Container)<{image: string}>`
   justify-self: flex-end;
   position: absolute;
   top: 0px;
