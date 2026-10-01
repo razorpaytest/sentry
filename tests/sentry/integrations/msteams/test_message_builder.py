@@ -402,7 +402,7 @@ class MSTeamsMessageBuilderTest(TestCase):
 
         assert 3 == len(issue_card["body"])
 
-    def test_action_payload_uses_only_legacy_rule_ids(self) -> None:
+    def test_action_payload_uses_notification_rule_ids(self) -> None:
         legacy_rule = self.rules[0]
         rules = [
             NotificationRule(
@@ -433,7 +433,7 @@ class MSTeamsMessageBuilderTest(TestCase):
 
         payload = builder.generate_action_payload(ACTION_TYPE.RESOLVE)
 
-        assert payload["payload"]["rules"] == [legacy_rule.id]
+        assert payload["payload"]["rules"] == [rule.id for rule in rules]
 
     def test_issue_with_only_one_rule(self) -> None:
         one_rule = self.rules[:1]

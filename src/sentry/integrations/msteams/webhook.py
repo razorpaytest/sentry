@@ -661,9 +661,7 @@ class MsTeamsWebhookEndpoint(Endpoint):
             # get the rules from the payload
             rules = tuple(
                 NotificationRule.from_deprecated_legacy_rule(rule)
-                for rule in Rule.objects.filter(
-                    id__in=payload["rules"], project_id=group.project_id
-                )
+                for rule in Rule.objects.filter(id__in=payload["rules"])
             )
 
             # pull the event based off our payload
